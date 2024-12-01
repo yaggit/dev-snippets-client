@@ -28,10 +28,11 @@ export const snippetService = {
         }
     },
     
-    async createSnippet(title: string, code: string, language: string) {
+    async createSnippet(title: string, description: string, code: string, language: string) {
         try {
         const response = await axiosInstance.post('/snippets', {
             title,
+            description,
             code,
             language,
         });
@@ -41,10 +42,11 @@ export const snippetService = {
         }
     },
     
-    async updateSnippet(id: number, title: string, code: string, language: string) {
+    async updateSnippet(id: number, title: string, description: string, code: string, language: string) {
         try {
         const response = await axiosInstance.put(`/snippets/${id}`, {
             title,
+            description,
             code,
             language,
         });

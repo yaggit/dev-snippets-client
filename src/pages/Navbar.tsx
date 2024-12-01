@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
             Dashboard
           </Link>
           <Link to="/yourSnippets" className="px-4 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition duration-200">
-            Your Snippets
+            My Snippets
           </Link>
           <Link to="/addSnippet" className="px-4 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition duration-200">
             Add Snippet
