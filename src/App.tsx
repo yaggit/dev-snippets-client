@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
 
-function App() {
-  const [count, setCount] = useState(0)
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import SnippetDetail from './pages/SnippetDetail';
+import YourSnippets from './pages/YourSnippets';
+import AddSnippet from './pages/AddSnippet';
+import Navbar from './pages/Navbar';
 
+const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{element}</>;
+};
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-export default App
+          {/* Protected routes */}
+          <Route path="/dashboard" element={<ProtectedRoute element={<><Navbar/><Dashboard /></>} />} />
+          <Route path="/snippet/:id" element={<ProtectedRoute element={<><Navbar/><SnippetDetail /></>} />} />
+          <Route path="/yourSnippets" element={<ProtectedRoute element={<><Navbar/><YourSnippets /></>} />} />
+          <Route path="/addSnippet" element={<ProtectedRoute element={<><Navbar/><AddSnippet /></>} />} />
+
+          {/* Redirect if no match */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
+};
+
+export default App;
