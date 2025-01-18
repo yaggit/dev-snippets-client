@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import { snippetService } from "../services/snippetService";
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
@@ -11,7 +10,6 @@ import { Button } from "@/components/ui/button";
 const Dashboard: React.FC = () => {
   const [snippets, setSnippets] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const { logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

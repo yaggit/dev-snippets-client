@@ -1,11 +1,9 @@
-// src/context/AuthContext.tsx
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -18,33 +16,39 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for token in localStorage when app loads
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = (token: string) => {
-    // Save token to localStorage and update state
     localStorage.setItem('token', token);
     setIsAuthenticated(true);
-    navigate('/dashboard'); // Redirect to dashboard
+    navigate('/dashboard');
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
-    navigate('/'); 
+    navigate('/');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
