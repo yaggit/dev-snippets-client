@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface ProtectedRouteProps {
-  element: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -19,5 +19,5 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  return <>{element}</>;
+  return <>{children}</>;
 };

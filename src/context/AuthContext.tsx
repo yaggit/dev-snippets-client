@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { axiosInstance } from '@/services/authService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -15,36 +17,51 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        setIsAuthenticated(!!token);
-      } catch (error) {
-        console.error('Auth initialization error:', error);
+        const response = await axiosInstance.get('/auth/check', { withCredentials: true });
+        if (response.status === 200) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch {
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeAuth();
+    checkAuth();
   }, []);
 
-  const login = (token: string) => {
-    localStorage.setItem('token', token);
-    setIsAuthenticated(true);
-    navigate('/dashboard');
+  const login = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      await axiosInstance.post('/auth/login', { email, password }, { withCredentials: true });
+      setIsAuthenticated(true);
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Login failed.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
-    navigate('/');
+  const logout = async () => {
+    try {
+      await axiosInstance.post('/auth/logout', {}, { withCredentials: true });
+      setIsAuthenticated(false);
+      toast.success('Logged out successfully!');
+      navigate('/');
+    } catch {
+      toast.error('Logout failed.');
+    }
   };
 
   return (

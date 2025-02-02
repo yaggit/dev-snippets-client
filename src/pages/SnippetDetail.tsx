@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { snippetService } from '../services/snippetService';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const SnippetDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,6 +39,7 @@ const SnippetDetail: React.FC = () => {
         <div className="text-center">
           <p className="text-lg">Loading...</p>
           <div className="mt-4">
+            <LoadingSpinner />
             <div className="animate-spin h-12 w-12 border-t-4 border-indigo-600 rounded-full border-t-transparent"></div>
           </div>
         </div>

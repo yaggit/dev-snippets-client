@@ -1,42 +1,38 @@
-// src/pages/Login.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authService } from '../services/authService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/dashboard');
+    if (isAuthenticated) {
+      navigate('/dashboard'); 
     }
-  }, [navigate]);
+  }, [isAuthenticated]);  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const response = await authService.login(email, password);
-      const token = response.token;
-
-      if (token) {
-        login(token);
-      }
+      await login(email, password)
     } catch (err) {
-      setError('Invalid credentials');
+      toast.error('Invalid credentials. Please try again.');
       console.error(err);
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white">
+      <ToastContainer position="top-right" autoClose={3000} /> {/* Toastify container */}
        <h1 className="text-2xl p-40 font-bold">
         Dev<span className="font-mono italic font-normal">snippets</span>
         </h1>
@@ -68,9 +64,10 @@ const Login: React.FC = () => {
             />
           </div>
           
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-
-          <button type="submit" className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">
+          <button
+            type="submit"
+            className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
+          >
             Login
           </button>
           

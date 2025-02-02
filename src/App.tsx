@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
-import { LoadingSpinner } from './components/LoadingSpinner';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { LoadingSpinner } from './components/LoadingSpinner';
 
 // Lazy load components
 const Login = React.lazy(() => import('./pages/Login'));
@@ -13,76 +15,55 @@ const YourSnippets = React.lazy(() => import('./pages/YourSnippets'));
 const AddSnippet = React.lazy(() => import('./pages/AddSnippet'));
 const Navbar = React.lazy(() => import('./pages/Navbar'));
 
-const App = () => {
-  return (
-    <Router>
-      <AuthProvider>
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-
-            {/* Protected routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute
-                  element={
-                    <>
-                      <Navbar />
-                      <Dashboard />
-                    </>
-                  }
-                />
-              }
-            />
-            <Route
-              path="/snippet/:id"
-              element={
-                <ProtectedRoute
-                  element={
-                    <>
-                      <Navbar />
-                      <SnippetDetail />
-                    </>
-                  }
-                />
-              }
-            />
-            <Route
-              path="/yourSnippets"
-              element={
-                <ProtectedRoute
-                  element={
-                    <>
-                      <Navbar />
-                      <YourSnippets />
-                    </>
-                  }
-                />
-              }
-            />
-            <Route
-              path="/addSnippet"
-              element={
-                <ProtectedRoute
-                  element={
-                    <>
-                      <Navbar />
-                      <AddSnippet />
-                    </>
-                  }
-                />
-              }
-            />
-
-            {/* Redirect if no match */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
-    </Router>
-  );
-};
+const App = () => (
+  <Router>
+    <AuthProvider>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/snippet/:id"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <SnippetDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/yourSnippets"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <YourSnippets />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addSnippet"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <AddSnippet />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
+    </AuthProvider>
+  </Router>
+);
 
 export default App;
